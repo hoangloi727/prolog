@@ -152,7 +152,7 @@ ambiguity_item(nominal_pp_attachment,
                [the,student,with,long,hair,in,the,garden,sleeps], 2, genuine,
                'in the garden can modify the student NOM or the embedded hair NP').
 
-:- begin_tests(own_tests).
+:- begin_tests(own_test).
 
 test(good_distribution, true(Counts == [baseline-6,b1-8,b2-8,b3-10,b4-8])) :-
     findall(Section-Words, good_item(Section, _, Words), Items),
@@ -220,7 +220,7 @@ test(b4_type_2_has_matrix_object) :-
     once(( parse([she,persuaded,him,to,leave], Tree),
            assertion(Tree = s(pro(she), vp(v(persuaded), pro(him), inf_clause(pro, to(inf), _)))) )).
 
-:- end_tests(own_tests).
+:- end_tests(own_test).
 
 section_counts(Items, Counts) :-
     section_count(baseline, Items, Baseline),
