@@ -29,7 +29,7 @@
                           pres_nonsg3/1 ]).
 
 :- discontiguous basic_vp//2.
-:- discontiguous noun//2, noun_c//3, adjective//1, adverb//1, preposition//2.
+:- discontiguous noun//2, noun_c//3, mass_noun//1, adjective//1, adverb//1, preposition//2.
 
 % ============================================================
 %  1. SENTENCE  (Ch. 2, 6)
@@ -51,8 +51,40 @@ np(np(Det,Nom), np_feat(agr(3,Num), _Case)) -->
     determiner(Det, Num),
     nominal(Nom, Num).
 
-nominal(nom(N), Num)      --> noun(N, Num).
-nominal(nom(AP,Nom), Num) --> ap(AP), nominal(Nom, Num).
+% [B1] Bare plurals and mass nouns are lexically licensed without a determiner.
+np(np(Nom), np_feat(agr(3,pl), _Case)) --> nominal(Nom, pl).
+np(np(Nom), np_feat(agr(3,sg), _Case)) --> mass_nominal(Nom).
+np(np(Predet,Det,Nom), np_feat(agr(3,Num), _Case)) -->
+    predeterminer(Predet),
+    determiner(Det, Num),
+    nominal(Nom, Num).
+np(np(Predet,Det,Nom), np_feat(agr(3,sg), _Case)) -->
+    predeterminer(Predet),
+    determiner(Det, sg),
+    mass_nominal(Nom).
+
+% [B1] NOM -> base (+ PP adjuncts). Selected PP complements stay inside Base.
+nominal(Nom, Num) -->
+    nominal_base(Base, Num),
+    nom_post_mods(Base, Nom).
+
+nominal_base(nom(N,PP), Num) -->
+    noun_c(N, Num, PForm),
+    pp(PP, pp_feat(PForm)).
+nominal_base(nom(N), Num) --> noun(N, Num).
+nominal_base(nom(AP,Nom), Num) --> ap(AP), nominal_base(Nom, Num).
+
+mass_nominal(Nom) -->
+    mass_nominal_base(Base),
+    nom_post_mods(Base, Nom).
+
+mass_nominal_base(nom(N)) --> mass_noun(N).
+mass_nominal_base(nom(AP,Nom)) --> ap(AP), mass_nominal_base(Nom).
+
+nom_post_mods(Nom, Nom) --> [].
+nom_post_mods(Acc, Nom) -->
+    pp(PP, _),
+    nom_post_mods(nom(Acc,PP), Nom).
 
 % ============================================================
 %  3. ADJECTIVE PHRASE / PREPOSITIONAL PHRASE  (Ch. 3)
@@ -198,7 +230,7 @@ noun_c(n(writer), sg, of) --> [writer].
 noun(n(novel),    sg)     --> [novel].
 noun(n(novels),   pl)     --> [novels].
 noun(n(beard),    sg)     --> [beard].
-noun(n(hair),     sg)     --> [hair].
+mass_noun(n(hair))        --> [hair].
 predeterminer(predet(all)) --> [all].
 preposition(p(of), of)    --> [of].
 
