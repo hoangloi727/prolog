@@ -109,6 +109,8 @@ post_adjuncts(Acc, VP) --> adjunct(Adj), post_adjuncts(vp(Acc,Adj), VP).
 
 adjunct(adv(A)) --> adverb(A).
 adjunct(PP)     --> pp(PP, _).
+% [B2] Adverbial subordinate clauses are sisters of VP.
+adjunct(SBar)   --> adverbial_sbar(SBar).
 
 % --- 4.1 Lexical verbs: the six subcategories of Ch. 4 -------
 
@@ -137,8 +139,22 @@ basic_vp(vp(V,PP), vp_feat(Agr,Form)) -->
     lexical_verb(V, lex_feat(Agr, Form, prep(PForm))),
     pp(PP, pp_feat(PForm)).
 
+% [B2] Finite S-bar complements are selected by the lexical subcategory.
+basic_vp(vp(V,SBar), vp_feat(Agr,Form)) -->
+    lexical_verb(V, lex_feat(Agr, Form, scomp(Comp))),
+    sbar(SBar, Comp).
+
 predicative(AP) --> ap(AP).
 predicative(NP) --> np(NP, np_feat(_, acc)).
+
+% [B2] S-bar always contains an overt complementiser and finite sentence.
+sbar(sbar(Comp,S), Comp) -->
+    complementiser(comp(Comp)),
+    sentence(S).
+
+adverbial_sbar(sbar(Sub,S)) -->
+    subordinator(Sub),
+    sentence(S).
 
 % --- 4.2 Auxiliary verbs: MOD > PERF > PROG > PASS  (Ch. 6) ---
 %     Ordering is enforced by FORM SELECTION, not by a list.

@@ -38,3 +38,40 @@ test(friend_wrong_selected_pp, [true]) :- bad([a,friend,of,novels,sleeps]).
 test(predeterminer_order, [true]) :- bad([the,all,books,sleep]).
 
 :- end_tests(b1_np_structure).
+
+:- begin_tests(b2_subordinate_clauses).
+
+ok(Words)  :- assertion(accepts(Words)).
+bad(Words) :- assertion(rejects(Words)).
+
+% B2: S-bar direct object selected by say.
+test(say_that) :- ok([she,said,that,he,left]).
+% B2: interrogative S-bar selected by ask.
+test(ask_whether) :- ok([she,asked,whether,he,left]).
+% B2: adverbial subordinate clause is a VP adjunct.
+test(because_clause) :- ok([she,left,because,he,arrived]).
+% B2: present-tense complement selection retains agreement.
+test(says_that) :- ok([she,says,that,they,leave]).
+% B2: selected S-bars can embed recursively after consuming a complementiser.
+test(nested_that_clause) :- ok([she,said,that,he,said,that,they,left]).
+% B2: adverbial clauses combine with a transitive matrix VP.
+test(transitive_because_clause) :-
+    ok([she,wrote,the,letter,because,he,arrived]).
+% B2: a VP may carry an adverb and an adverbial S-bar.
+test(stacked_vp_adjuncts) :- ok([she,left,quickly,because,he,arrived]).
+% B2: the embedded sentence remains a normal finite clause.
+test(embedded_transitive_clause) :-
+    ok([she,said,that,he,wrote,the,letter]).
+
+% B2 negative: say selects [that], not [whether].
+test(say_wrong_complementiser, [true]) :-
+    bad([she,said,whether,he,left]).
+% B2 negative: ask selects [whether], not [that].
+test(ask_wrong_complementiser, [true]) :-
+    bad([she,asked,that,he,left]).
+% B2 negative: the embedded clause must be finite.
+test(embedded_nonfinite, [true]) :- bad([she,said,that,he,leave]).
+% B2 negative: an adverbial subordinate clause requires its subordinator.
+test(missing_subordinator, [true]) :- bad([she,left,he,arrived]).
+
+:- end_tests(b2_subordinate_clauses).
