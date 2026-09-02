@@ -1,0 +1,27 @@
+Part C2 measurements
+Machine: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64
+Prolog: SWI-Prolog 10.0.2 for x86_64-linux
+
+Command:
+swipl -q -s tests_own.pl -g "evaluation_sets(Good, Bad), harness:evaluate(Good, Bad), halt(0)"
+
+== EVALUATION ==========================
+Coverage         : 40/40  (1.00)
+Challenge errors : 0/20  (0.00)
+Mean ambiguity   : 1.07 parses/sentence
+----------------------------------------
+========================================
+
+Bounded generation (harness:sample/2):
+length=3 distinct_strings=3125
+length=4 distinct_strings=78981
+length=5 distinct_strings=1730607
+
+Slowest fixed evaluation item:
+Method: accepts/1 for Good and rejects/1 for Bad; every item measured
+individually five times with get_time/1; maximum mean selected.
+kind=rejects
+words=[the,book,which,she,wrote,the,letter,sleeps]
+mean_seconds=0.000026464
+max_seconds=0.000065804
+runs_seconds=[0.00001621246337890625,0.00001430511474609375,0.0000126361846923828125,0.00006580352783203125,0.000023365020751953125]
