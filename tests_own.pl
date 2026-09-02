@@ -1,178 +1,235 @@
 :- use_module(library(plunit)).
+:- use_module(library(lists), [member/2]).
 :- use_module(harness).
 
-:- begin_tests(baseline_coverage).
+% C1 evaluation inventory: 40 grammatical sentences.
+% Distribution: baseline 6, B1 8, B2 8, B3 10, B4 8.
 
-ok(Words)  :- assertion(accepts(Words)).
-bad(Words) :- assertion(rejects(Words)).
+good_item(baseline, intransitive, [kim,slept]).
+good_item(baseline, transitive, [kim,wrote,the,letter]).
+good_item(baseline, ditransitive, [they,give,her,a,story]).
+good_item(baseline, perfect, [she,has,written,the,letter]).
+good_item(baseline, passive, [the,letter,was,written]).
+good_item(baseline, modal, [she,can,write,the,letter]).
 
-% Baseline positive coverage.
-test(baseline_intransitive) :- ok([kim,slept]).
-test(baseline_transitive) :- ok([kim,wrote,the,letter]).
-test(baseline_ditransitive) :- ok([they,give,her,a,story]).
-test(baseline_perfect) :- ok([she,has,written,the,letter]).
-test(baseline_passive) :- ok([the,letter,was,written]).
-test(baseline_modal) :- ok([she,can,write,the,letter]).
+good_item(b1, pp_complement, [a,writer,of,novels,sleeps]).
+good_item(b1, pp_adjunct, [the,student,with,long,hair,sleeps]).
+good_item(b1, predeterminer, [all,the,old,books,sleep]).
+good_item(b1, complement_and_adjunct, [a,writer,of,novels,with,a,beard,sleeps]).
+good_item(b1, stacked_postmodifiers, [the,student,with,long,hair,in,the,garden,sleeps]).
+good_item(b1, bare_plural_complement, [a,writer,of,books,sleeps]).
+good_item(b1, selected_with_complement, [a,friend,with,the,garden,sleeps]).
+good_item(b1, adjective_before_adjunct, [the,old,student,with,long,hair,sleeps]).
 
-% Baseline negatives: agreement, case, and auxiliary-form selection.
-test(baseline_agreement_violation, [true]) :- bad([she,write,the,letter]).
-test(baseline_case_violation, [true]) :- bad([them,write,the,letter]).
-test(baseline_aux_form_violation, [true]) :- bad([she,has,writing,the,letter]).
+good_item(b2, that_object, [she,said,that,he,left]).
+good_item(b2, whether_object, [she,asked,whether,he,left]).
+good_item(b2, because_adjunct, [she,left,because,he,arrived]).
+good_item(b2, present_that_object, [she,says,that,they,leave]).
+good_item(b2, nested_that_object, [she,said,that,he,said,that,they,left]).
+good_item(b2, transitive_because_adjunct, [she,wrote,the,letter,because,he,arrived]).
+good_item(b2, stacked_vp_adjuncts, [she,left,quickly,because,he,arrived]).
+good_item(b2, embedded_transitive_clause, [she,said,that,he,wrote,the,letter]).
 
-% Ambiguity inventory: both are known spurious passive by-phrase analyses.
-test(ambiguity_passive_by, [true(N =:= 2)]) :-
-    n_parses([the,letter,was,written,by,kim], N).
-test(ambiguity_perfect_passive_by, [true(N =:= 3)]) :-
-    n_parses([the,letter,has,been,written,by,kim], N).
+good_item(b3, wh_question, [what,did,she,write]).
+good_item(b3, wh_question_plural, [what,did,they,admire]).
+good_item(b3, which_relative, [the,book,which,she,wrote,sleeps]).
+good_item(b3, that_relative, [the,book,that,she,wrote,sleeps]).
+good_item(b3, zero_relative, [the,book,she,wrote,sleeps]).
+good_item(b3, adjectival_relative_head, [the,old,book,which,she,wrote,sleeps]).
+good_item(b3, predeterminer_relative_head, [all,the,books,that,she,wrote,sleep]).
+good_item(b3, relative_with_vp_adjunct, [the,book,which,she,wrote,quickly,sleeps]).
+good_item(b3, relative_on_complement_head, [a,writer,of,books,which,she,admired,sleeps]).
+good_item(b3, wh_question_with_adjunct, [what,did,she,write,quickly]).
 
-:- end_tests(baseline_coverage).
+good_item(b4, type_1_covert_subject, [she,wants,to,leave]).
+good_item(b4, type_1_overt_subject, [she,wants,him,to,leave]).
+good_item(b4, type_2_matrix_object, [she,persuaded,him,to,leave]).
+good_item(b4, type_1_plural_subject, [they,want,to,leave]).
+good_item(b4, type_1_overt_plural_subject, [they,want,her,to,leave]).
+good_item(b4, type_2_plural_subject, [they,persuaded,her,to,leave]).
+good_item(b4, type_1_past, [she,wanted,him,to,leave]).
+good_item(b4, type_1_perfect, [she,has,wanted,to,leave]).
 
-:- begin_tests(b1_np_structure).
+% C1 challenge set: 20 ungrammatical sentences.
+% Distribution: baseline 3, B1 4, B2 4, B3 5, B4 4.
 
-ok(Words)  :- assertion(accepts(Words)).
-bad(Words) :- assertion(rejects(Words)).
+bad_item(baseline, agreement, [she,write,the,letter],
+         'third-person singular subject requires writes').
+bad_item(baseline, case, [them,give,her,a,story],
+         'them is accusative and cannot be the subject').
+bad_item(baseline, auxiliary_form, [she,has,writing,the,letter],
+         'perfect have selects the en form, not ing').
 
-% B1: selected PP complement is sister of N.
-test(writer_of_novels) :- ok([a,writer,of,novels,sleeps]).
-% B1: PP adjunct is sister of NOM.
-test(student_with_hair) :- ok([the,student,with,long,hair,sleeps]).
-% B1: pre-determiner precedes the determiner.
-test(predeterminer) :- ok([all,the,old,books,sleep]).
-% B1: the complement and following adjunct occupy distinct attachment sites.
-test(writer_complement_and_adjunct) :-
-    ok([a,writer,of,novels,with,a,beard,sleeps]).
-% B1: stacked post-modifying PPs terminate and preserve input order.
-test(stacked_nominal_pps) :-
-    ok([the,student,with,long,hair,in,the,garden,sleeps]).
-% B1: bare plural NP is available inside the selected of-PP.
-test(bare_plural_complement) :- ok([a,writer,of,books,sleeps]).
-% B1: an added PP-selecting noun uses its selected with-PP.
-test(friend_with_garden) :- ok([a,friend,with,the,garden,sleeps]).
-% B1: adjectival modification remains inside NOM before post-modification.
-test(adjective_then_pp) :- ok([the,old,student,with,long,hair,sleeps]).
-% B1 ambiguity: the final PP can modify writer or the embedded novels NP.
-test(complement_adjunct_attachment_ambiguity, [true(N =:= 2)]) :-
-    n_parses([a,writer,of,novels,with,a,beard,sleeps], N).
-% B1 ambiguity: the final PP can modify hair or the containing student NOM.
-test(nominal_pp_attachment_ambiguity, [true(N =:= 2)]) :-
-    n_parses([the,student,with,long,hair,in,the,garden,sleeps], N).
+bad_item(b1, bare_count_noun, [student,sleeps],
+         'a singular count noun requires a determiner').
+bad_item(b1, writer_pp_selection, [a,writer,with,novels,sleeps],
+         'writer selects an of PP complement').
+bad_item(b1, friend_pp_selection, [a,friend,of,novels,sleeps],
+         'friend selects a with PP complement').
+bad_item(b1, predeterminer_order, [the,all,books,sleep],
+         'the predeterminer must precede the determiner').
 
-% B1 negative: singular count nouns remain unavailable as bare NPs.
-test(bare_singular_count, [true]) :- bad([student,sleeps]).
-% B1 negative: writer selects [of], not an arbitrary PP complement.
-test(writer_wrong_selected_pp, [true]) :- bad([a,writer,with,a,beard,sleeps]).
-% B1 negative: friend selects [with], not an arbitrary PP complement.
-test(friend_wrong_selected_pp, [true]) :- bad([a,friend,of,novels,sleeps]).
-% B1 negative: a pre-determiner cannot appear after a determiner.
-test(predeterminer_order, [true]) :- bad([the,all,books,sleep]).
+bad_item(b2, say_complementiser, [she,said,whether,he,left],
+         'say selects that, not whether').
+bad_item(b2, ask_complementiser, [she,asked,that,he,left],
+         'ask selects whether, not that').
+bad_item(b2, embedded_form, [she,said,that,he,leave],
+         'the embedded clause must be finite').
+bad_item(b2, missing_subordinator, [she,left,he,arrived],
+         'an adverbial subordinate clause requires because').
 
-:- end_tests(b1_np_structure).
+bad_item(b3, double_gap_fill, [what,did,she,write,the,letter],
+         'the object gap introduced by what is filled twice').
+bad_item(b3, do_form, [what,did,she,wrote],
+         'did selects a bare VP').
+bad_item(b3, missing_do_support, [what,she,wrote],
+         'this grammar licenses root wh inversion with did').
+bad_item(b3, relative_double_gap_fill,
+         [the,book,which,she,wrote,the,letter,sleeps],
+         'the relative object gap is filled twice').
+bad_item(b3, relative_nonfinite, [the,book,which,she,write,sleeps],
+         'the relative clause must be finite').
 
-:- begin_tests(b2_subordinate_clauses).
+bad_item(b4, type_1_missing_to, [she,wants,him,leave],
+         'the infinitival VP requires to').
+bad_item(b4, type_2_missing_object, [she,persuaded,to,leave],
+         'Type II persuade requires a matrix direct object').
+bad_item(b4, type_2_missing_to, [she,persuaded,him,leave],
+         'the infinitival VP requires to').
+bad_item(b4, infinitival_form, [she,wants,him,to,left],
+         'to selects the bare form leave').
 
-ok(Words)  :- assertion(accepts(Words)).
-bad(Words) :- assertion(rejects(Words)).
+evaluation_sets(Good, Bad) :-
+    findall(Words, good_item(_, _, Words), Good),
+    findall(Words, bad_item(_, _, Words, _), Bad).
 
-% B2: S-bar direct object selected by say.
-test(say_that) :- ok([she,said,that,he,left]).
-% B2: interrogative S-bar selected by ask.
-test(ask_whether) :- ok([she,asked,whether,he,left]).
-% B2: adverbial subordinate clause is a VP adjunct.
-test(because_clause) :- ok([she,left,because,he,arrived]).
-% B2: present-tense complement selection retains agreement.
-test(says_that) :- ok([she,says,that,they,leave]).
-% B2: selected S-bars can embed recursively after consuming a complementiser.
-test(nested_that_clause) :- ok([she,said,that,he,said,that,they,left]).
-% B2: adverbial clauses combine with a transitive matrix VP.
-test(transitive_because_clause) :-
-    ok([she,wrote,the,letter,because,he,arrived]).
-% B2: a VP may carry an adverb and an adverbial S-bar.
-test(stacked_vp_adjuncts) :- ok([she,left,quickly,because,he,arrived]).
-% B2: the embedded sentence remains a normal finite clause.
-test(embedded_transitive_clause) :-
-    ok([she,said,that,he,wrote,the,letter]).
+% Each pair differs in one constructionally relevant respect.
+minimal_pair(perfect_form,
+             [she,has,written,the,letter],
+             [she,has,writing,the,letter],
+             'perfect have selects en').
+minimal_pair(subject_case,
+             [they,give,her,a,story],
+             [them,give,her,a,story],
+             'subject position requires nominative case').
+minimal_pair(writer_pp_selection,
+             [a,writer,of,novels,sleeps],
+             [a,writer,with,novels,sleeps],
+             'writer selects of').
+minimal_pair(say_complementiser,
+             [she,said,that,he,left],
+             [she,said,whether,he,left],
+             'say selects that').
+minimal_pair(ask_complementiser,
+             [she,asked,whether,he,left],
+             [she,asked,that,he,left],
+             'ask selects whether').
+minimal_pair(wh_do_form,
+             [what,did,she,write],
+             [what,did,she,wrote],
+             'did selects bare').
+minimal_pair(wh_gap_linearity,
+             [what,did,she,write],
+             [what,did,she,write,the,letter],
+             'the wh object gap is discharged once').
+minimal_pair(infinitival_form,
+             [she,wants,him,to,leave],
+             [she,wants,him,to,left],
+             'to selects bare').
 
-% B2 negative: say selects [that], not [whether].
-test(say_wrong_complementiser, [true]) :-
-    bad([she,said,whether,he,left]).
-% B2 negative: ask selects [whether], not [that].
-test(ask_wrong_complementiser, [true]) :-
-    bad([she,asked,that,he,left]).
-% B2 negative: the embedded clause must be finite.
-test(embedded_nonfinite, [true]) :- bad([she,said,that,he,leave]).
-% B2 negative: an adverbial subordinate clause requires its subordinator.
-test(missing_subordinator, [true]) :- bad([she,left,he,arrived]).
+% Class is genuine when both phrase markers reflect a plausible attachment;
+% it is spurious when the same by-phrase is licensed by duplicate rule paths.
+ambiguity_item(passive_by,
+               [the,letter,was,written,by,kim], 2, spurious,
+               'vp_passive and generic VP adjunct rules both license by kim').
+ambiguity_item(perfect_passive_by,
+               [the,letter,has,been,written,by,kim], 3, spurious,
+               'by kim is licensed in the passive and as adjuncts at two VP levels').
+ambiguity_item(writer_pp_attachment,
+               [a,writer,of,novels,with,a,beard,sleeps], 2, genuine,
+               'with a beard can modify writer or the embedded novels NP').
+ambiguity_item(nominal_pp_attachment,
+               [the,student,with,long,hair,in,the,garden,sleeps], 2, genuine,
+               'in the garden can modify the student NOM or the embedded hair NP').
 
-:- end_tests(b2_subordinate_clauses).
+:- begin_tests(own_tests).
 
-:- begin_tests(b3_wh_and_relatives).
+test(good_distribution, true(Counts == [baseline-6,b1-8,b2-8,b3-10,b4-8])) :-
+    findall(Section-Words, good_item(Section, _, Words), Items),
+    section_counts(Items, Counts).
 
-ok(Words)     :- assertion(accepts(Words)).
-bad(Words)    :- assertion(rejects(Words)).
-np_ok(Words)  :- assertion(phrase(grammar_core:np(_, np_feat(_, _)), Words)).
-np_bad(Words) :- assertion(\+ phrase(grammar_core:np(_, np_feat(_, _)), Words)).
+test(bad_distribution, true(Counts == [baseline-3,b1-4,b2-4,b3-5,b4-4])) :-
+    findall(Section-Words, bad_item(Section, _, Words, _), Items),
+    section_counts(Items, Counts).
 
-% B3: object wh-questions introduce and discharge one NP gap.
-test(what_did_she_write) :- ok([what,did,she,write]).
-test(what_did_they_admire) :- ok([what,did,they,admire]).
-% B3: restrictive relative clauses may use which, that, or zero.
-test(which_relative) :- np_ok([the,book,which,she,wrote]).
-test(that_relative) :- np_ok([the,book,that,she,wrote]).
-test(zero_relative) :- np_ok([the,book,she,wrote]).
-% B3: relatives attach at NOM alongside B1 modifiers.
-test(adjectival_head_relative) :- np_ok([the,old,book,which,she,wrote]).
-test(predeterminer_head_relative) :- np_ok([all,the,books,that,she,wrote]).
-test(relative_with_vp_adjunct) :- np_ok([the,book,which,she,wrote,quickly]).
-test(complement_head_relative) :-
-    np_ok([a,writer,of,books,which,she,admired]).
-test(question_with_vp_adjunct) :- ok([what,did,she,write,quickly]).
+test(evaluation_set_sizes, true(GoodCount-BadCount == 40-20)) :-
+    evaluation_sets(Good, Bad),
+    length(Good, GoodCount),
+    length(Bad, BadCount).
 
-% B3 negative: the object position introduced by what cannot also be overt.
-test(question_gap_filled_twice, [true]) :-
-    bad([what,did,she,write,the,letter]).
-% B3 negative: did selects a bare VP, not a past finite VP.
-test(question_form_mismatch, [true]) :- bad([what,did,she,wrote]).
-% B3 negative: this grammar licenses wh inversion only with do support.
-test(question_missing_do_support, [true]) :- bad([what,she,wrote]).
-% B3 negative: a relative must contain the object gap, not another object NP.
-test(relative_gap_filled_twice, [true]) :-
-    np_bad([the,book,which,she,wrote,the,letter]).
-% B3 negative: the relative clause must contain a finite VP.
-test(relative_nonfinite, [true]) :- np_bad([the,book,which,she,write]).
+test(good_items_are_accepted) :-
+    evaluation_sets(Good, _),
+    forall(member(Words, Good), assertion(accepts(Words))).
 
-:- end_tests(b3_wh_and_relatives).
+test(bad_items_are_rejected) :-
+    evaluation_sets(_, Bad),
+    forall(member(Words, Bad), assertion(rejects(Words))).
 
-:- begin_tests(b4_nonfinite_clauses).
+test(minimal_pair_count, true(Count =:= 8)) :-
+    findall(Name, minimal_pair(Name, _, _, _), Pairs),
+    length(Pairs, Count).
 
-ok(Words)  :- assertion(accepts(Words)).
-bad(Words) :- assertion(rejects(Words)).
+test(minimal_pairs_isolate_rejection) :-
+    forall(minimal_pair(_, Good, Bad, _),
+           ( assertion(accepts(Good)), assertion(rejects(Bad)) )).
 
-% B4: Type I supports covert and overt subjects in the infinitival clause.
-test(type_i_covert_subject) :-
-    ok([she,wants,to,leave]).
-test(type_i_overt_subject) :-
-    ok([she,wants,him,to,leave]).
-% B4: Type II keeps the NP as the matrix direct object.
-test(type_ii_matrix_object) :-
-    ok([she,persuaded,him,to,leave]).
-test(type_i_plural_subject) :-
-    ok([they,want,to,leave]).
-test(type_i_overt_plural_matrix_subject) :-
-    ok([they,want,her,to,leave]).
-test(type_ii_plural_subject) :-
-    ok([they,persuaded,her,to,leave]).
-test(type_i_past) :-
-    ok([she,wanted,him,to,leave]).
-test(type_i_perfect) :-
-    ok([she,has,wanted,to,leave]).
+test(ambiguity_inventory, true(Count =:= 4)) :-
+    findall(Name, ambiguity_item(Name, _, _, _, _), Items),
+    length(Items, Count).
 
-% B4 negative: an infinitival VP requires the overt marker [to].
-test(type_i_missing_to, [true]) :- bad([she,wants,him,leave]).
-% B4 negative: Type II requires its matrix direct object.
-test(type_ii_missing_object, [true]) :- bad([she,persuaded,to,leave]).
-% B4 negative: Type II cannot omit the infinitival marker.
-test(type_ii_missing_to, [true]) :- bad([she,persuaded,him,leave]).
-% B4 negative: [to] selects the bare form, not the past form.
-test(infinitival_form_mismatch, [true]) :- bad([she,wants,him,to,left]).
+test(ambiguity_counts) :-
+    forall(ambiguity_item(_, Words, Expected, _, _),
+           ( n_parses(Words, Actual), assertion(Actual =:= Expected) )).
 
-:- end_tests(b4_nonfinite_clauses).
+% Phrase-marker checks for the structural claims made by B1-B4.
+test(b1_complement_pp_is_inside_nominal_base) :-
+    once(( phrase(grammar_core:np(Tree, np_feat(_, _)), [a,writer,of,novels]),
+           assertion(Tree = np(det(a), nom(n(writer), _))) )).
+
+test(b1_adjunct_pp_wraps_nominal_base) :-
+    once(( phrase(grammar_core:np(Tree, np_feat(_, _)), [the,student,with,long,hair]),
+           assertion(Tree = np(det(the), nom(nom(n(student)), _))) )).
+
+test(b2_selected_sbar_is_vp_complement) :-
+    once(( parse([she,said,that,he,left], Tree),
+           assertion(Tree = s(pro(she), vp(v(said), sbar(that, _)))) )).
+
+test(b3_question_contains_object_gap_clause) :-
+    once(( parse([what,did,she,write], Tree),
+           assertion(Tree = q(wh(what), aux(did), s(pro(she), vp(v(write))))) )).
+
+test(b3_relative_is_nominal_postmodifier) :-
+    once(( parse([the,book,which,she,wrote,sleeps], Tree),
+           assertion(Tree = s(np(det(the), nom(nom(n(book)), rel_clause(_, _))), _)) )).
+
+test(b4_type_1_embeds_overt_subject) :-
+    once(( parse([she,wants,him,to,leave], Tree),
+           assertion(Tree = s(pro(she), vp(v(wants), inf_clause(pro(him), to(inf), _)))) )).
+
+test(b4_type_2_has_matrix_object) :-
+    once(( parse([she,persuaded,him,to,leave], Tree),
+           assertion(Tree = s(pro(she), vp(v(persuaded), pro(him), inf_clause(pro, to(inf), _)))) )).
+
+:- end_tests(own_tests).
+
+section_counts(Items, Counts) :-
+    section_count(baseline, Items, Baseline),
+    section_count(b1, Items, B1),
+    section_count(b2, Items, B2),
+    section_count(b3, Items, B3),
+    section_count(b4, Items, B4),
+    Counts = [baseline-Baseline,b1-B1,b2-B2,b3-B3,b4-B4].
+
+section_count(Section, Items, Count) :-
+    findall(Words, member(Section-Words, Items), Matches),
+    length(Matches, Count).
