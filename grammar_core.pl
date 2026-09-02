@@ -29,6 +29,7 @@
                           pres_nonsg3/1 ]).
 
 :- discontiguous basic_vp//2.
+:- discontiguous noun//2, noun_c//3, adjective//1, adverb//1, preposition//2.
 
 % ============================================================
 %  1. SENTENCE  (Ch. 2, 6)
@@ -192,6 +193,37 @@ preposition(p(by),   by)   --> [by].
 preposition(p(at),   at)   --> [at].
 preposition(p(with), with) --> [with].
 
+% [B1] Required NP vocabulary; noun_c/3 records PP selection for B1.
+noun_c(n(writer), sg, of) --> [writer].
+noun(n(novel),    sg)     --> [novel].
+noun(n(novels),   pl)     --> [novels].
+noun(n(beard),    sg)     --> [beard].
+noun(n(hair),     sg)     --> [hair].
+predeterminer(predet(all)) --> [all].
+preposition(p(of), of)    --> [of].
+
+% [B1] Project additions: friend selects [with]; garden, green, and quietly
+% provide additional nominal and modifier vocabulary for the declared tests.
+noun_c(n(friend), sg, with) --> [friend].
+noun(n(garden),   sg)       --> [garden].
+adjective(adj(green))       --> [green].
+adverb(adv(quietly))        --> [quietly].
+preposition(p(near), near)  --> [near].
+
+% [B2] Complementisers and subordinator; selection is encoded on the verb.
+complementiser(comp(that))       --> [that].
+complementiser(comp(whether))    --> [whether].
+subordinator(subordinator(because)) --> [because].
+
+% [B3] Wh and relative-clause vocabulary. The zero relativiser consumes no input.
+wh_pronoun(wh(what), np)         --> [what].
+relativiser(rel(which))           --> [which].
+relativiser(rel(that))            --> [that].
+relativiser(rel(zero))            --> [].
+
+% [B4] Infinitival to is distinct from the lexical preposition [to].
+infinitival_marker(to(inf)) --> [to].
+
 % --- 5.7 Lexical verbs --------------------------------------
 %     Each entry: word / agreement / form / subcategory
 
@@ -253,6 +285,76 @@ lexical_verb(v(rely),   lex_feat(Agr, fin(pres), prep(on))) --> [rely],
 lexical_verb(v(relied), lex_feat(_, fin(past), prep(on))) --> [relied].
 lexical_verb(v(rely),   lex_feat(_, bare, prep(on)))      --> [rely].
 
+% [B2] say selects a that-clause; forms supplied for finite and auxiliary use.
+lexical_verb(v(says),   lex_feat(agr(3,sg), fin(pres), scomp(that))) --> [says].
+lexical_verb(v(say),    lex_feat(Agr, fin(pres), scomp(that))) --> [say],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(said),   lex_feat(_, fin(past), scomp(that))) --> [said].
+lexical_verb(v(say),    lex_feat(_, bare, scomp(that)))      --> [say].
+lexical_verb(v(said),   lex_feat(_, en, scomp(that)))        --> [said].
+lexical_verb(v(saying), lex_feat(_, ing, scomp(that)))       --> [saying].
+
+% [B2] ask selects a whether-clause.
+lexical_verb(v(asks),   lex_feat(agr(3,sg), fin(pres), scomp(whether))) --> [asks].
+lexical_verb(v(ask),    lex_feat(Agr, fin(pres), scomp(whether))) --> [ask],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(asked),  lex_feat(_, fin(past), scomp(whether))) --> [asked].
+lexical_verb(v(ask),    lex_feat(_, bare, scomp(whether)))      --> [ask].
+lexical_verb(v(asked),  lex_feat(_, en, scomp(whether)))        --> [asked].
+lexical_verb(v(asking), lex_feat(_, ing, scomp(whether)))       --> [asking].
+
+% [B2] arrive is needed by adverbial subordinate clauses.
+lexical_verb(v(arrives),  lex_feat(agr(3,sg), fin(pres), intrans)) --> [arrives].
+lexical_verb(v(arrive),   lex_feat(Agr, fin(pres), intrans)) --> [arrive],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(arrived),  lex_feat(_, fin(past), intrans)) --> [arrived].
+lexical_verb(v(arrive),   lex_feat(_, bare, intrans))      --> [arrive].
+lexical_verb(v(arrived),  lex_feat(_, en, intrans))        --> [arrived].
+lexical_verb(v(arriving), lex_feat(_, ing, intrans))       --> [arriving].
+
+% [B4] Non-finite-clause selection is lexical: want is Type I; persuade is Type II.
+lexical_verb(v(wants),   lex_feat(agr(3,sg), fin(pres), infinitive(type_1))) --> [wants].
+lexical_verb(v(want),    lex_feat(Agr, fin(pres), infinitive(type_1))) --> [want],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(wanted),  lex_feat(_, fin(past), infinitive(type_1))) --> [wanted].
+lexical_verb(v(want),    lex_feat(_, bare, infinitive(type_1)))      --> [want].
+lexical_verb(v(wanted),  lex_feat(_, en, infinitive(type_1)))        --> [wanted].
+lexical_verb(v(wanting), lex_feat(_, ing, infinitive(type_1)))       --> [wanting].
+
+lexical_verb(v(persuades),  lex_feat(agr(3,sg), fin(pres), infinitive(type_2))) --> [persuades].
+lexical_verb(v(persuade),   lex_feat(Agr, fin(pres), infinitive(type_2))) --> [persuade],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(persuaded),  lex_feat(_, fin(past), infinitive(type_2))) --> [persuaded].
+lexical_verb(v(persuade),   lex_feat(_, bare, infinitive(type_2)))      --> [persuade].
+lexical_verb(v(persuaded),  lex_feat(_, en, infinitive(type_2)))        --> [persuaded].
+lexical_verb(v(persuading), lex_feat(_, ing, infinitive(type_2)))       --> [persuading].
+
+% [B4] leave supplies the lexical VP required by the infinitival examples.
+lexical_verb(v(leaves),   lex_feat(agr(3,sg), fin(pres), intrans)) --> [leaves].
+lexical_verb(v(leave),    lex_feat(Agr, fin(pres), intrans)) --> [leave],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(left),     lex_feat(_, fin(past), intrans)) --> [left].
+lexical_verb(v(leave),    lex_feat(_, bare, intrans))      --> [leave].
+lexical_verb(v(left),     lex_feat(_, en, intrans))        --> [left].
+lexical_verb(v(leaving),  lex_feat(_, ing, intrans))       --> [leaving].
+
+% [B1] Project additions: admire (transitive) and travel (intransitive).
+lexical_verb(v(admires),  lex_feat(agr(3,sg), fin(pres), trans)) --> [admires].
+lexical_verb(v(admire),   lex_feat(Agr, fin(pres), trans)) --> [admire],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(admired),  lex_feat(_, fin(past), trans)) --> [admired].
+lexical_verb(v(admire),   lex_feat(_, bare, trans))      --> [admire].
+lexical_verb(v(admired),  lex_feat(_, en, trans))        --> [admired].
+lexical_verb(v(admiring), lex_feat(_, ing, trans))       --> [admiring].
+
+lexical_verb(v(travels),  lex_feat(agr(3,sg), fin(pres), intrans)) --> [travels].
+lexical_verb(v(travel),   lex_feat(Agr, fin(pres), intrans)) --> [travel],
+    { pres_nonsg3(Agr) }.
+lexical_verb(v(travelled),lex_feat(_, fin(past), intrans)) --> [travelled].
+lexical_verb(v(travel),   lex_feat(_, bare, intrans))      --> [travel].
+lexical_verb(v(travelled),lex_feat(_, en, intrans))        --> [travelled].
+lexical_verb(v(travelling),lex_feat(_, ing, intrans))      --> [travelling].
+
 % --- 5.8 Auxiliary verbs ------------------------------------
 %     aux_feat(Agr, OwnForm, Function, FormSelectedFromComplement)
 
@@ -269,6 +371,9 @@ auxiliary(aux(have),  aux_feat(Agr, fin(pres), perf, en)) --> [have],
 auxiliary(aux(had),   aux_feat(_, fin(past), perf, en)) --> [had].
 auxiliary(aux(have),  aux_feat(_, bare, perf, en))      --> [have].
 auxiliary(aux(having),aux_feat(_, ing,  perf, en))      --> [having].
+
+% [B3] DO support selects a bare VP; its active grammar rule is added in B3.
+auxiliary(aux(did), aux_feat(_, fin(past), do, bare)) --> [did].
 
 % Progressive BE: selects [ing]
 auxiliary(aux(is),    aux_feat(agr(3,sg), fin(pres), prog, ing)) --> [is].
