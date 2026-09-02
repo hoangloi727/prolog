@@ -1,6 +1,32 @@
 :- use_module(library(plunit)).
 :- use_module(harness).
 
+:- begin_tests(baseline_coverage).
+
+ok(Words)  :- assertion(accepts(Words)).
+bad(Words) :- assertion(rejects(Words)).
+
+% Baseline positive coverage.
+test(baseline_intransitive) :- ok([kim,slept]).
+test(baseline_transitive) :- ok([kim,wrote,the,letter]).
+test(baseline_ditransitive) :- ok([they,give,her,a,story]).
+test(baseline_perfect) :- ok([she,has,written,the,letter]).
+test(baseline_passive) :- ok([the,letter,was,written]).
+test(baseline_modal) :- ok([she,can,write,the,letter]).
+
+% Baseline negatives: agreement, case, and auxiliary-form selection.
+test(baseline_agreement_violation, [true]) :- bad([she,write,the,letter]).
+test(baseline_case_violation, [true]) :- bad([them,write,the,letter]).
+test(baseline_aux_form_violation, [true]) :- bad([she,has,writing,the,letter]).
+
+% Ambiguity inventory: both are known spurious passive by-phrase analyses.
+test(ambiguity_passive_by, [true(N =:= 2)]) :-
+    n_parses([the,letter,was,written,by,kim], N).
+test(ambiguity_perfect_passive_by, [true(N =:= 3)]) :-
+    n_parses([the,letter,has,been,written,by,kim], N).
+
+:- end_tests(baseline_coverage).
+
 :- begin_tests(b1_np_structure).
 
 ok(Words)  :- assertion(accepts(Words)).
@@ -27,6 +53,9 @@ test(adjective_then_pp) :- ok([the,old,student,with,long,hair,sleeps]).
 % B1 ambiguity: the final PP can modify writer or the embedded novels NP.
 test(complement_adjunct_attachment_ambiguity, [true(N =:= 2)]) :-
     n_parses([a,writer,of,novels,with,a,beard,sleeps], N).
+% B1 ambiguity: the final PP can modify hair or the containing student NOM.
+test(nominal_pp_attachment_ambiguity, [true(N =:= 2)]) :-
+    n_parses([the,student,with,long,hair,in,the,garden,sleeps], N).
 
 % B1 negative: singular count nouns remain unavailable as bare NPs.
 test(bare_singular_count, [true]) :- bad([student,sleeps]).
@@ -112,3 +141,38 @@ test(relative_gap_filled_twice, [true]) :-
 test(relative_nonfinite, [true]) :- np_bad([the,book,which,she,write]).
 
 :- end_tests(b3_wh_and_relatives).
+
+:- begin_tests(b4_nonfinite_clauses).
+
+ok(Words)  :- assertion(accepts(Words)).
+bad(Words) :- assertion(rejects(Words)).
+
+% B4: Type I supports covert and overt subjects in the infinitival clause.
+test(type_i_covert_subject) :-
+    ok([she,wants,to,leave]).
+test(type_i_overt_subject) :-
+    ok([she,wants,him,to,leave]).
+% B4: Type II keeps the NP as the matrix direct object.
+test(type_ii_matrix_object) :-
+    ok([she,persuaded,him,to,leave]).
+test(type_i_plural_subject) :-
+    ok([they,want,to,leave]).
+test(type_i_overt_plural_matrix_subject) :-
+    ok([they,want,her,to,leave]).
+test(type_ii_plural_subject) :-
+    ok([they,persuaded,her,to,leave]).
+test(type_i_past) :-
+    ok([she,wanted,him,to,leave]).
+test(type_i_perfect) :-
+    ok([she,has,wanted,to,leave]).
+
+% B4 negative: an infinitival VP requires the overt marker [to].
+test(type_i_missing_to, [true]) :- bad([she,wants,him,leave]).
+% B4 negative: Type II requires its matrix direct object.
+test(type_ii_missing_object, [true]) :- bad([she,persuaded,to,leave]).
+% B4 negative: Type II cannot omit the infinitival marker.
+test(type_ii_missing_to, [true]) :- bad([she,persuaded,him,leave]).
+% B4 negative: [to] selects the bare form, not the past form.
+test(infinitival_form_mismatch, [true]) :- bad([she,wants,him,to,left]).
+
+:- end_tests(b4_nonfinite_clauses).

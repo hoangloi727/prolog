@@ -191,6 +191,28 @@ basic_vp_with_gap(vp(Aux,VP), vp_feat(Agr,Form)) -->
     { active_function(Function) },
     vp_with_gap(VP, vp_feat(_, Selected), gap(np)).
 
+% [B4] Type I verbs select an infinitival clause whose subject may be overt
+% or covert. Type II verbs take a matrix direct object and a covert subject.
+basic_vp(vp(V,Inf), vp_feat(Agr,Form)) -->
+    lexical_verb(V, lex_feat(Agr, Form, infinitive(type_1))),
+    infinitival_clause(Inf, type_1).
+
+basic_vp(vp(V,DO,Inf), vp_feat(Agr,Form)) -->
+    lexical_verb(V, lex_feat(Agr, Form, infinitive(type_2))),
+    np(DO, np_feat(_, acc)),
+    infinitival_clause(Inf, type_2).
+
+infinitival_clause(inf_clause(pro,To,VP), type_1) -->
+    infinitival_marker(To),
+    vp(VP, vp_feat(_, bare)).
+infinitival_clause(inf_clause(NP,To,VP), type_1) -->
+    np(NP, np_feat(_, acc)),
+    infinitival_marker(To),
+    vp(VP, vp_feat(_, bare)).
+infinitival_clause(inf_clause(pro,To,VP), type_2) -->
+    infinitival_marker(To),
+    vp(VP, vp_feat(_, bare)).
+
 % --- 4.2 Auxiliary verbs: MOD > PERF > PROG > PASS  (Ch. 6) ---
 %     Ordering is enforced by FORM SELECTION, not by a list.
 
