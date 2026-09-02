@@ -75,3 +75,40 @@ test(embedded_nonfinite, [true]) :- bad([she,said,that,he,leave]).
 test(missing_subordinator, [true]) :- bad([she,left,he,arrived]).
 
 :- end_tests(b2_subordinate_clauses).
+
+:- begin_tests(b3_wh_and_relatives).
+
+ok(Words)     :- assertion(accepts(Words)).
+bad(Words)    :- assertion(rejects(Words)).
+np_ok(Words)  :- assertion(phrase(grammar_core:np(_, np_feat(_, _)), Words)).
+np_bad(Words) :- assertion(\+ phrase(grammar_core:np(_, np_feat(_, _)), Words)).
+
+% B3: object wh-questions introduce and discharge one NP gap.
+test(what_did_she_write) :- ok([what,did,she,write]).
+test(what_did_they_admire) :- ok([what,did,they,admire]).
+% B3: restrictive relative clauses may use which, that, or zero.
+test(which_relative) :- np_ok([the,book,which,she,wrote]).
+test(that_relative) :- np_ok([the,book,that,she,wrote]).
+test(zero_relative) :- np_ok([the,book,she,wrote]).
+% B3: relatives attach at NOM alongside B1 modifiers.
+test(adjectival_head_relative) :- np_ok([the,old,book,which,she,wrote]).
+test(predeterminer_head_relative) :- np_ok([all,the,books,that,she,wrote]).
+test(relative_with_vp_adjunct) :- np_ok([the,book,which,she,wrote,quickly]).
+test(complement_head_relative) :-
+    np_ok([a,writer,of,books,which,she,admired]).
+test(question_with_vp_adjunct) :- ok([what,did,she,write,quickly]).
+
+% B3 negative: the object position introduced by what cannot also be overt.
+test(question_gap_filled_twice, [true]) :-
+    bad([what,did,she,write,the,letter]).
+% B3 negative: did selects a bare VP, not a past finite VP.
+test(question_form_mismatch, [true]) :- bad([what,did,she,wrote]).
+% B3 negative: this grammar licenses wh inversion only with do support.
+test(question_missing_do_support, [true]) :- bad([what,she,wrote]).
+% B3 negative: a relative must contain the object gap, not another object NP.
+test(relative_gap_filled_twice, [true]) :-
+    np_bad([the,book,which,she,wrote,the,letter]).
+% B3 negative: the relative clause must contain a finite VP.
+test(relative_nonfinite, [true]) :- np_bad([the,book,which,she,write]).
+
+:- end_tests(b3_wh_and_relatives).

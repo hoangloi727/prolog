@@ -36,7 +36,11 @@
 %     S -> NP[nom] + VP[finite],  agreement via shared Agr
 % ============================================================
 
-sentence(s(NP, VP)) -->
+sentence(S) --> finite_sentence(S).
+% [B3] Root object wh-questions introduce an NP gap in a bare clause.
+sentence(Q) --> wh_question(Q).
+
+finite_sentence(s(NP, VP)) -->
     np(NP, np_feat(Agr, nom)),
     vp(VP, vp_feat(Agr, fin(_))).
 
@@ -85,6 +89,10 @@ nom_post_mods(Nom, Nom) --> [].
 nom_post_mods(Acc, Nom) -->
     pp(PP, _),
     nom_post_mods(nom(Acc,PP), Nom).
+% [B3] Restrictive relatives are NOM-level post-modifiers.
+nom_post_mods(Acc, Nom) -->
+    relative_clause(Rel),
+    nom_post_mods(nom(Acc,Rel), Nom).
 
 % ============================================================
 %  3. ADJECTIVE PHRASE / PREPOSITIONAL PHRASE  (Ch. 3)
@@ -150,11 +158,38 @@ predicative(NP) --> np(NP, np_feat(_, acc)).
 % [B2] S-bar always contains an overt complementiser and finite sentence.
 sbar(sbar(Comp,S), Comp) -->
     complementiser(comp(Comp)),
-    sentence(S).
+    finite_sentence(S).
 
 adverbial_sbar(sbar(Sub,S)) -->
     subordinator(Sub),
-    sentence(S).
+    finite_sentence(S).
+
+% [B3] The gap is introduced by the wh phrase or relative clause and is
+% discharged only by the transitive basic-VP alternative below.
+wh_question(q(Wh,Aux,S)) -->
+    wh_pronoun(Wh, np),
+    auxiliary(Aux, aux_feat(_, fin(past), do, bare)),
+    s_with_gap(S, vp_feat(_, bare), gap(np)).
+
+relative_clause(rel_clause(Rel,S)) -->
+    relativiser(Rel),
+    s_with_gap(S, vp_feat(_, fin(_)), gap(np)).
+
+s_with_gap(s(NP,VP), vp_feat(Agr,Form), Gap) -->
+    np(NP, np_feat(Agr, nom)),
+    vp_with_gap(VP, vp_feat(Agr, Form), Gap).
+
+vp_with_gap(VP, F, nogap) --> vp(VP, F).
+vp_with_gap(VP, F, gap(np)) -->
+    basic_vp_with_gap(Base, F),
+    post_adjuncts(Base, VP).
+
+basic_vp_with_gap(vp(V), vp_feat(Agr,Form)) -->
+    lexical_verb(V, lex_feat(Agr, Form, trans)).
+basic_vp_with_gap(vp(Aux,VP), vp_feat(Agr,Form)) -->
+    auxiliary(Aux, aux_feat(Agr, Form, Function, Selected)),
+    { active_function(Function) },
+    vp_with_gap(VP, vp_feat(_, Selected), gap(np)).
 
 % --- 4.2 Auxiliary verbs: MOD > PERF > PROG > PASS  (Ch. 6) ---
 %     Ordering is enforced by FORM SELECTION, not by a list.
